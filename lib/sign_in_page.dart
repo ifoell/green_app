@@ -14,6 +14,8 @@ class _SignInPageState extends State<SignInPage> {
   String _eMail;
   String _password;
 
+  bool _isHidden = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,10 +29,18 @@ class _SignInPageState extends State<SignInPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: TextFormField(
-                        decoration: InputDecoration(labelText: 'eMail', border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                            labelText: 'E-Mail',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.email)),
                         validator: (value) {
                           if (value.isEmpty) {
-                            return 'eMail tidak boleh kosong';
+                            return 'E-Mail tidak boleh kosong';
+                          } else {
+                            if ((value.contains('penis')) |
+                                (value.contains('vagina'))) {
+                              return 'E-Mail tidak boleh mengandung unsur PORNOGRAFI';
+                            }
                           }
                           return null;
                         },
@@ -42,9 +52,17 @@ class _SignInPageState extends State<SignInPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: TextFormField(
-                        
-                        obscureText: true,
-                        decoration: InputDecoration(labelText: 'password', border: OutlineInputBorder()),
+                        obscureText: _isHidden,
+                        decoration: InputDecoration(
+                            labelText: 'password',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.lock),
+                            suffixIcon: InkWell(
+                              onTap: _togglePasswordView,
+                              child: Icon(_isHidden
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                            )),
                         validator: (value) {
                           if (value.isEmpty) {
                             return 'password tidak boleh kosong';
@@ -61,32 +79,47 @@ class _SignInPageState extends State<SignInPage> {
                       child: ElevatedButton(
                         child: Text('Sign In'),
                         onPressed: () {
-                          if( _formKey.currentState.validate()){
+                          if (_formKey.currentState.validate()) {
                             _formKey.currentState.save();
 
                             print('email : $_eMail     password : $_password');
 
-                            try{
-                              FirebaseAuth.instance.signInWithEmailAndPassword(email:_eMail, password: _password );
-                            }catch(e){
+                            try {
+                              FirebaseAuth.instance.signInWithEmailAndPassword(
+                                  email: _eMail, password: _password);
+                            } catch (e) {
                               print(e);
                             }
 
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Splash()));
-
-                            
-
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Splash()));
                           }
                         },
                       ),
                     ),
-                    Row(children: [
-                      Text('Belum punya aku ?  '),
-                      InkWell(child: Text('Sign UP'),onTap: (){
-                        Navigator.pushReplacement(context, MaterialPageRoute( builder: (context) => SignUpPage()));
-                      },)
-                    ],)
+                    Row(
+                      children: [
+                        Text('Belum punya akun ?  '),
+                        InkWell(
+                          child: Text('Sign Up'),
+                          onTap: () {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SignUpPage()));
+                          },
+                        )
+                      ],
+                    )
                   ],
                 ))));
+  }
+
+  void _togglePasswordView() {
+    setState(() {
+      _isHidden = !_isHidden;
+    });
   }
 }

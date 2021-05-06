@@ -15,6 +15,8 @@ class _SignUpPageState extends State<SignUpPage> {
 
   String _eMail;
   String _password;
+  bool _isHidden = true;
+  bool _isHidden2 = true;
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +31,22 @@ class _SignUpPageState extends State<SignUpPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: TextFormField(
-                        decoration: InputDecoration(labelText: 'eMail', border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                            labelText: 'E-Mail',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.mail)),
                         validator: (value) {
                           if (value.isEmpty) {
-                            return 'eMail tidak boleh kosong';
+                            return 'E-Mail tidak boleh kosong';
+                          } else {
+                            if (value.length < 5) {
+                              return 'E-Mail tidak boleh kurang dari 5 karakter';
+                            } else {
+                              if ((value.contains('penis')) |
+                                  (value.contains('vagina'))) {
+                                return 'E-Mail tidak boleh mengandung unsur PORNOGRAFI';
+                              }
+                            }
                           }
                           return null;
                         },
@@ -45,11 +59,24 @@ class _SignUpPageState extends State<SignUpPage> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: TextFormField(
                         controller: passwordTC,
-                        obscureText: true,
-                        decoration: InputDecoration(labelText: 'password', border: OutlineInputBorder()),
+                        obscureText: _isHidden,
+                        decoration: InputDecoration(
+                            labelText: 'password',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.lock),
+                            suffixIcon: InkWell(
+                              onTap: _togglePasswordView,
+                              child: Icon(_isHidden
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                            )),
                         validator: (value) {
                           if (value.isEmpty) {
                             return 'password tidak boleh kosong';
+                          } else {
+                            if (value.length < 5) {
+                              return 'password tidak boleh kurang dari 5 karakter';
+                            }
                           }
                           return null;
                         },
@@ -61,8 +88,17 @@ class _SignUpPageState extends State<SignUpPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: TextFormField(
-                        obscureText: true,
-                        decoration: InputDecoration(labelText: 'konfirmasi password', border: OutlineInputBorder()),
+                        obscureText: _isHidden2,
+                        decoration: InputDecoration(
+                            labelText: 'konfirmasi password',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.lock),
+                            suffixIcon: InkWell(
+                              onTap: _togglePasswordView2,
+                              child: Icon(_isHidden2
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                            )),
                         validator: (value) {
                           if (value.isEmpty) {
                             return 'password tidak boleh kosong';
@@ -77,35 +113,55 @@ class _SignUpPageState extends State<SignUpPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: ElevatedButton(
-                        child: Text('Sign In'),
+                        child: Text('Sign Up'),
                         onPressed: () {
                           if (_formKey.currentState.validate()) {
                             _formKey.currentState.save();
 
                             try {
-                              FirebaseAuth.instance.createUserWithEmailAndPassword(email: _eMail, password: _password);
+                              FirebaseAuth.instance
+                                  .createUserWithEmailAndPassword(
+                                      email: _eMail, password: _password);
                             } catch (e) {
                               print(e);
                             }
 
                             print('email : $_eMail     password : $_password');
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Splash()));
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Splash()));
                           }
                         },
                       ),
                     ),
                     Row(
                       children: [
-                        Text('SUdah punya akun ?  '),
+                        Text('Sudah punya akun ?  '),
                         InkWell(
-                          child: Text('Sign IN'),
+                          child: Text('Sign In'),
                           onTap: () {
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignInPage()));
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SignInPage()));
                           },
                         )
                       ],
                     )
                   ],
                 ))));
+  }
+
+  void _togglePasswordView() {
+    setState(() {
+      _isHidden = !_isHidden;
+    });
+  }
+
+  void _togglePasswordView2() {
+    setState(() {
+      _isHidden2 = !_isHidden2;
+    });
   }
 }

@@ -20,7 +20,6 @@ class _SplashState extends State<Splash> {
     User user = FirebaseAuth.instance.currentUser;
     if(user == null){
       Navigator.pushReplacement(context, MaterialPageRoute( builder: (context) => SignInPage()));
-
     }else{
       Navigator.pushReplacement(context, MaterialPageRoute( builder: (context) => HomePage()));
     }
